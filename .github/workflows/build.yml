@@ -16,4 +16,4 @@ jobs:
       - name: Clean build cache
         run: cargo clean
       - name: Build release
-        run: cargo build --release --target thumbv8m.main-none-eabihf
+        run: cargo build --release --target thumbv8m.main-none-eabihf -Z build-std
