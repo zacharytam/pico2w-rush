@@ -3,54 +3,45 @@
 
 use defmt::*;
 use embassy_executor::Spawner;
-use embassy_net::{Config, DhcpConfig, StackResources};
-use embassy_rp::peripherals::{DMA_CH0, PIO0};
-use embassy_rp::pio::{InterruptHandler, Pio};
-use embassy_time::{Duration, Timer};
+use embassy_net::{Config, Stack, StackResources};
+use embassy_rp::init;
+use embassy_time::Timer;
+use panic_probe as _;
 use static_cell::StaticCell;
-use cyw43_pio::PioSpi;
-use embassy_net::tcp::TcpSocket;
-use {defmt_rtt as _, panic_probe as _};
 
-bind_interrupts!(struct Irqs {
-    PIO0_IRQ_0 => InterruptHandler<PIO0>;
-});
+use cyw43::{Control, State};
+use cyw43_pio::PioSpi;
 
 #[embassy_executor::main]
 async fn main(_spawner: Spawner) {
-    info!("Starting Pico 2 W Wi-Fi demo...");
+    info!("Initializing Pico 2 W Wi-Fi...");
 
-    // Initialize Wi-Fi SPI driver
-    let pio = Pio::new(PIO0, Irqs);
-    let mut wifi_spi = PioSpi::new(pio, DMA_CH0);
-    let cyw43 = cyw43::new(wifi_spi).await.unwrap();
+    let p = init(Default::default());
 
-    // DHCP config with hostname
-    let mut dhcp = DhcpConfig::default();
-    dhcp.hostname = Some("pico2w-rust".try_into().unwrap());
-    let config = Config::dhcpv4(dhcp);
+    // CYW43 driver setup
+    let fw = include_bytes!("cyw43_fw.bin");
+    let clm = include_bytes!("cyw43_clm.blob");
+    static STATE: StaticCell<State> = StaticCell::new();
+    let state = STATE.init(State::new());
+    let pwr = p.PIN_23;
+    let cs = p.PIN_25;
+    let sck = p.PIN_29;
+    let dio = p.PIN_28;
 
-    static RESOURCES: StaticCell<StackResources<3>> = StaticCell::new();
-    let stack = embassy_net::Stack::new(cyw43, config, RESOURCES.init(StackResources::new()));
+    let spi = PioSpi::new(
+        p.PIO0, p.DMA_CH0, sck, dio, cs,
+    );
 
-    stack.run().await;
+    let mut control = Control::new(state, spi, pwr).await;
+    control.init(fw, clm).await;
 
-    info!("Connecting to Wi-Fi...");
-    stack.join("YourSSID", "YourPassword").await.unwrap();
+    // Create Access Point
+    control.start_ap(b"Pico2W_AP", b"12345678", 6).await.unwrap();
+    info!("Access Point started. SSID: Pico2W_AP, Password: 12345678");
 
-    info!("Connected! Fetching example.com...");
-    let mut socket = TcpSocket::new(&stack);
-    socket.connect("93.184.216.34:80").await.unwrap(); // example.com
-
-    let request = b"GET / HTTP/1.1\r\nHost: example.com\r\nConnection: close\r\n\r\n";
-    socket.write_all(request).await.unwrap();
-
-    let mut buffer = [0u8; 1024];
-    let n = socket.read(&mut buffer).await.unwrap();
-    info!("Received: {}", core::str::from_utf8(&buffer[..n]).unwrap());
-
+    // Keep running
     loop {
-        Timer::after(Duration::from_secs(5)).await;
-        info!("Still alive...");
+        Timer::after_secs(5).await;
+        info!("Wi-Fi still active...");
     }
 }
