@@ -34,7 +34,7 @@ panic-probe = { version = "1.0.0" }
 
 [features]
 # Default features for your firmware
-default = ["defmt", "cyw43"]
+default = ["defmt"]
 
 # Logging / firmware debug
 defmt = ["defmt", "defmt-rtt"]
