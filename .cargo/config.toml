@@ -10,6 +10,6 @@ target = "thumbv8m.main-none-eabihf"
 runner = "probe-rs run --chip RP2350A"
 rustflags = [
   "-C", "link-arg=-Tlink.x",
-  # THIS LINE IS ESSENTIAL to fix E0152 when using -Z build-std
+  # Use this precise format for command line arguments:
   "-C", "link-arg=-nodefaultlibs", 
 ]
