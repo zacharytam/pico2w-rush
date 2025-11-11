@@ -1,6 +1,7 @@
 [unstable-features]
 build-std = ["core", "alloc"]
-build-std-config = '{"target": "thumbv8m.main-none-eabihf"}'
+# build-std-config is only needed if you specifically target a single board in your config
+# build-std-config = '{"target": "thumbv8m.main-none-eabihf"}'
 
 [build]
 target = "thumbv8m.main-none-eabihf" # This line is optional but helpful
