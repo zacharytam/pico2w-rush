@@ -1,18 +1,15 @@
 [unstable-features]
 build-std = ["core", "alloc"]
-# build-std-config is only needed if you specifically target a single board in your config
-# build-std-config = '{"target": "thumbv8m.main-none-eabihf"}'
 
 [build]
 target = "thumbv8m.main-none-eabihf"
-
-# >>>>> Add these lines to fix the E0152 error: <<<<<
-[target.'thumbv8m.main-none-eabihf'.link-args]
-# These arguments prevent the linker from pulling in the pre-compiled std/core/alloc from the toolchain
-rustc-link-arg-bins = ["-nodefaultlibs"] 
 
 [target.thumbv8m.main-none-eabihf]
 runner = "probe-rs run --chip RP2350A"
 rustflags = [
   "-C", "link-arg=-Tlink.x",
+  # Add the needed linker argument here:
+  "-C", "link-arg=-nodefaultlibs",
 ]
+
+# You can remove the separate [target.'...'.link-args] section entirely now
