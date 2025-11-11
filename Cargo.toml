@@ -2,23 +2,33 @@
 name = "pico2w-rush"
 version = "0.1.0"
 edition = "2024"
+resolver = "2"
 
 [dependencies]
-# Embassy core crates — all from the same repo/commit
+# --- Embassy Core (all from same repo to avoid version conflicts) ---
 embassy-executor = { git = "https://github.com/embassy-rs/embassy.git", branch = "main" }
 embassy-time = { git = "https://github.com/embassy-rs/embassy.git", branch = "main" }
-embassy-net = { git = "https://github.com/embassy-rs/embassy.git", branch = "main" }
-embassy-net-driver-channel = { git = "https://github.com/embassy-rs/embassy.git", branch = "main" }
 embassy-sync = { git = "https://github.com/embassy-rs/embassy.git", branch = "main" }
 embassy-futures = { git = "https://github.com/embassy-rs/embassy.git", branch = "main" }
-embassy-rp = { git = "https://github.com/embassy-rs/embassy.git", branch = "main", features = ["rp235x", "time-driver", "critical-section-impl", "defmt"] }
+embassy-net = { git = "https://github.com/embassy-rs/embassy.git", branch = "main" }
+embassy-net-driver-channel = { git = "https://github.com/embassy-rs/embassy.git", branch = "main" }
+embassy-rp = { git = "https://github.com/embassy-rs/embassy.git", branch = "main", features = [
+    "rp235x",
+    "critical-section-impl",
+    "time-driver",
+    "defmt",
+] }
 cyw43 = { git = "https://github.com/embassy-rs/embassy.git", branch = "main" }
 
-# Async + misc dependencies
+# --- Other dependencies ---
 defmt = "0.3"
 defmt-rtt = "0.4"
-futures = { version = "0.3", default-features = false }
+panic-probe = "0.3"
 cortex-m = "0.7"
 cortex-m-rt = "0.7"
-panic-probe = "0.3"
+futures = { version = "0.3", default-features = false }
 
+[profile.release]
+opt-level = "s"
+lto = true
+codegen-units = 1
