@@ -1,18 +1,22 @@
 [package]
 name = "pico2w-rush"
 version = "0.1.0"
-edition = "2021"
+edition = "2024"
 
 [dependencies]
 embassy-executor = { version = "0.3", features = ["arch-cortex-m", "executor-thread"] }
-embassy-time = "0.3"
-embassy-rp = { version = "0.3", features = ["rp2350", "time-driver", "pio"] }
+embassy-time = "0.5"
+embassy-rp = { version = "0.3", features = ["rp235xa", "time-driver"] }
 embassy-net = { version = "0.3", features = ["dhcpv4", "tcp", "dhcpv4-hostname"] }
+embassy-sync = "0.7"
+embassy-futures = "0.1"
 
-cyw43 = "0.1.0"
-cyw43-pio = "0.1.0"
+cyw43 = { git = "https://github.com/embassy-rs/embassy.git", package = "cyw43" }
+cyw43-pio = { git = "https://github.com/embassy-rs/embassy.git", package = "cyw43-pio" }
 
 defmt = "0.3"
 defmt-rtt = "0.4"
 panic-probe = { version = "0.3", features = ["print-defmt"] }
 static_cell = "2.0"
+cortex-m = "0.7"
+cortex-m-rt = "0.7"
