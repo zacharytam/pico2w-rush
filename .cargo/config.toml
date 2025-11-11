@@ -4,7 +4,12 @@ build-std = ["core", "alloc"]
 # build-std-config = '{"target": "thumbv8m.main-none-eabihf"}'
 
 [build]
-target = "thumbv8m.main-none-eabihf" # This line is optional but helpful
+target = "thumbv8m.main-none-eabihf"
+
+# >>>>> Add these lines to fix the E0152 error: <<<<<
+[target.'thumbv8m.main-none-eabihf'.link-args]
+# These arguments prevent the linker from pulling in the pre-compiled std/core/alloc from the toolchain
+rustc-link-arg-bins = ["-nodefaultlibs"] 
 
 [target.thumbv8m.main-none-eabihf]
 runner = "probe-rs run --chip RP2350A"
