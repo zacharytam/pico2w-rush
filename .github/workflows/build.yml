@@ -16,4 +16,8 @@ jobs:
       - name: Clean build cache
         run: cargo clean
       - name: Build release
+        # Set RUSTFLAGS explicitly here to ensure -nodefaultlibs is used
         run: cargo build --release --target thumbv8m.main-none-eabihf -Z build-std
+        env:
+          RUSTFLAGS: "-C link-arg=-nodefaultlibs -C link-arg=-Tlink.x"
+
