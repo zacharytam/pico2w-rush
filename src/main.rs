@@ -18,7 +18,6 @@ async fn main(_spawner: Spawner) {
 
     let p = init(Default::default());
 
-    // CYW43 driver setup
     let fw = include_bytes!("cyw43_fw.bin");
     let clm = include_bytes!("cyw43_clm.blob");
     static STATE: StaticCell<State> = StaticCell::new();
@@ -35,11 +34,9 @@ async fn main(_spawner: Spawner) {
     let mut control = Control::new(state, spi, pwr).await;
     control.init(fw, clm).await;
 
-    // Create Access Point
     control.start_ap(b"Pico2W_AP", b"12345678", 6).await.unwrap();
     info!("Access Point started. SSID: Pico2W_AP, Password: 12345678");
 
-    // Keep running
     loop {
         Timer::after_secs(5).await;
         info!("Wi-Fi still active...");
