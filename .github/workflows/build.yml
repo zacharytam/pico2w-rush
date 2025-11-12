@@ -14,8 +14,14 @@ jobs:
         with:
           components: rust-src, llvm-tools-preview
           targets: thumbv8m.main-none-eabihf
+      # Add this step to aggressively clear caches
+      - name: Purge Cargo Caches
+        run: |
+          rm -rf ~/.cargo/registry
+          rm -rf ~/.cargo/git
+
       - name: Clean build cache
         run: cargo clean
       - name: Build release
-        # No 'env' block needed here
+        # Use the specific, long form of the build-std flag
         run: cargo build --release --target thumbv8m.main-none-eabihf -Z build-std=core,alloc,compiler_builtins,unwind
