@@ -16,6 +16,9 @@ embassy-net = { git = "https://github.com/embassy-rs/embassy.git", branch = "mai
 embassy-rp = { git = "https://github.com/embassy-rs/embassy.git", branch = "main", features = ["_rp235x"] }
 smoltcp = { version = "0.12.0", features = ["proto-ipv4"] }
 
+# Add this line to force no_std compilation for the managed crate
+managed = { version = "0.8.0", default-features = false } 
+
 # CYW43439 WiFi driver
 cyw43 = { git = "https://github.com/embassy-rs/embassy.git", branch = "main", package = "cyw43" }
 
